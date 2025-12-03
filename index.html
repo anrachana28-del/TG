@@ -1,36 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Telegram Web Monitor</title>
+    <title>Telegram Members</title>
 </head>
 <body>
-<h2>Telegram Messages (User Account)</h2>
-<div id="log"></div>
+    <h1>Telegram Members</h1>
+    <input type="text" id="chat_id" placeholder="Enter Chat ID">
+    <button onclick="loadMembers()">Load Members</button>
+    <ul id="members"></ul>
 
-<h3>Reply</h3>
-<input id="chatId" placeholder="Chat ID">
-<input id="msg" placeholder="Message">
-<button onclick="send()">Send</button>
-
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script>
-const socket = io();
-
-socket.on("telegram_message", data => {
-    const log = document.getElementById("log");
-    log.innerHTML += `
-        <p>
-            <b>${data.name || "Unknown"}:</b> ${data.text}<br>
-            <small>${data.username || ""} | ChatID: ${data.chat_id}</small>
-        </p>
-    `;
-});
-
-function send() {
-    const chatId = document.getElementById("chatId").value;
-    const msg = document.getElementById("msg").value;
-    socket.emit("send_message", { chat_id: chatId, text: msg });
-}
-</script>
+    <script>
+        async function loadMembers() {
+            const chatId = document.getElementById("chat_id").value;
+            const res = await fetch(`/members/${chatId}`);
+            const data = await res.json();
+            const ul = document.getElementById("members");
+            ul.innerHTML = "";
+            data.forEach(user => {
+                const li = document.createElement("li");
+                li.textContent = `${user.id} - ${user.first_name} ${user.last_name} (${user.username}) ${user.phone || ""}`;
+                ul.appendChild(li);
+            });
+        }
+    </script>
 </body>
 </html>
