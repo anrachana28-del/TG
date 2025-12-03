@@ -1,27 +1,36 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Telegram Account Web Monitor</title>
+    <title>Telegram Web Monitor</title>
 </head>
 <body>
-
 <h2>Telegram Messages (User Account)</h2>
 <div id="log"></div>
 
+<h3>Reply</h3>
+<input id="chatId" placeholder="Chat ID">
+<input id="msg" placeholder="Message">
+<button onclick="send()">Send</button>
+
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-const socket = io("http://localhost:5000");
+const socket = io();
 
 socket.on("telegram_message", data => {
-  document.getElementById("log").innerHTML += `
-    <p>
-      <b>${data.name || "Unknown"}:</b>
-      ${data.text}
-      <br><small>${data.username || ""}</small>
-    </p>
-  `;
+    const log = document.getElementById("log");
+    log.innerHTML += `
+        <p>
+            <b>${data.name || "Unknown"}:</b> ${data.text}<br>
+            <small>${data.username || ""} | ChatID: ${data.chat_id}</small>
+        </p>
+    `;
 });
-</script>
 
+function send() {
+    const chatId = document.getElementById("chatId").value;
+    const msg = document.getElementById("msg").value;
+    socket.emit("send_message", { chat_id: chatId, text: msg });
+}
+</script>
 </body>
 </html>
