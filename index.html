@@ -1,27 +1,32 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Telegram Members</title>
-</head>
-<body>
-    <h1>Telegram Members</h1>
-    <input type="text" id="chat_id" placeholder="Enter Chat ID">
-    <button onclick="loadMembers()">Load Members</button>
-    <ul id="members"></ul>
+<h2>Messages</h2>
+<table id="messagesTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Sender</th>
+            <th>Text</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
 
-    <script>
-        async function loadMembers() {
-            const chatId = document.getElementById("chat_id").value;
-            const res = await fetch(`/members/${chatId}`);
-            const data = await res.json();
-            const ul = document.getElementById("members");
-            ul.innerHTML = "";
-            data.forEach(user => {
-                const li = document.createElement("li");
-                li.textContent = `${user.id} - ${user.first_name} ${user.last_name} (${user.username}) ${user.phone || ""}`;
-                ul.appendChild(li);
-            });
-        }
-    </script>
-</body>
-</html>
+<script>
+async function loadMessages(groupId) {
+    const res = await fetch(`/messages/${groupId}`);
+    const messages = await res.json();
+    const tbody = document.querySelector("#messagesTable tbody");
+    tbody.innerHTML = "";
+    messages.forEach(m => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td>${m.id}</td><td>${m.sender_id}</td><td>${m.text || ""}</td><td>${m.date}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+// update when group selected
+groupSelect.addEventListener("change", e => {
+    const groupId = e.target.value;
+    loadMembers(groupId);
+    loadMessages(groupId);
+});
