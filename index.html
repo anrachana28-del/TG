@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Telegram Account Web Monitor</title>
+</head>
+<body>
+
+<h2>Telegram Messages (User Account)</h2>
+<div id="log"></div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+const socket = io("http://localhost:5000");
+
+socket.on("telegram_message", data => {
+  document.getElementById("log").innerHTML += `
+    <p>
+      <b>${data.name || "Unknown"}:</b>
+      ${data.text}
+      <br><small>${data.username || ""}</small>
+    </p>
+  `;
+});
+</script>
+
+</body>
+</html>
