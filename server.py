@@ -1,14 +1,14 @@
 import os
 from telethon import TelegramClient, events
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, render_template
 from flask_socketio import SocketIO
 
-api_id = int(os.environ["28013497"])
-api_hash = os.environ["3bd0587beedb80c8336bdea42fc67e27"]
+api_id = int(os.environ["API_ID"])
+api_hash = os.environ["API_HASH"]
 
 client = TelegramClient("session", api_id, api_hash)
 
-app = Flask(__name__, template_folder='.')  # index.html នៅ root folder
+app = Flask(__name__, template_folder='.')
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="eventlet")
 
 @app.route("/")
