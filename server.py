@@ -1,45 +1,28 @@
-import os
-import asyncio
 from telethon import TelegramClient
-from telethon.tl.types import ChannelParticipantsAdmins
-from flask import Flask, render_template
-from flask_socketio import SocketIO
 
 api_id = 28013497
 api_hash = "3bd0587beedb80c8336bdea42fc67e27"
-session_name = "session"  # session.session
+session_name = "session.session"
 
-# Flask setup
-app = Flask(__name__)
-socketio = SocketIO(app, async_mode='eventlet')
-
-# Telethon setup
 client = TelegramClient(session_name, api_id, api_hash)
 
-async def get_members():
-    await client.start()  # uses session.session
-    # Replace with your target chat/group username or ID
-    target = "https://t.me/YOUR_GROUP_OR_CHANNEL"
-    members = []
-    async for user in client.iter_participants(target):
-        members.append({
-            "id": user.id,
-            "username": user.username,
-            "first_name": user.first_name,
-            "last_name": user.last_name
+async def fetch_messages(group_id, limit=50):
+    messages_list = []
+    async for msg in client.iter_messages(group_id, limit=limit):
+        messages_list.append({
+            "id": msg.id,
+            "sender_id": msg.sender_id,
+            "text": msg.text,
+            "date": str(msg.date)
         })
-    return members
+    return messages_list
 
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-@socketio.on("connect")
-def handle_connect():
-    async def send_members():
-        members = await get_members()
-        socketio.emit("members", members)
-    asyncio.run(send_members())
-
-if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+async def fetch_members(group_id):
+    members_list = []
+    async for user in client.iter_participants(group_id):
+        members_list.append({
+            "id": user.id,
+            "name": user.first_name or "",
+            "username": user.username or ""
+        })
+    return members_list
